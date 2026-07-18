@@ -5,6 +5,8 @@ import test from "node:test";
 const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
 const css = await readFile(new URL("../styles.css", import.meta.url), "utf8");
 const js = await readFile(new URL("../app.js", import.meta.url), "utf8");
+const logoSvg = await readFile(new URL("../assets/munilink-logo.svg", import.meta.url));
+const logoPng = await readFile(new URL("../assets/munilink-logo.png", import.meta.url));
 
 test("page exposes a single h1 and labelled primary navigation", () => {
   assert.equal((html.match(/<h1\b/g) || []).length, 1);
@@ -40,4 +42,12 @@ test("decision lens explains the audit gates without unsupported claims", () => 
   assert.match(html, /Is the need specific\?/);
   assert.match(html, /Are the conditions real\?/);
   assert.match(html, /Can people stay accountable\?/);
+});
+
+test("supplied MuniLink branding is used with a resilient image fallback", () => {
+  assert.ok(logoSvg.length > 0);
+  assert.ok(logoPng.length > 0);
+  assert.match(html, /srcset="assets\/munilink-logo\.svg"/);
+  assert.match(html, /src="assets\/munilink-logo\.png"/);
+  assert.match(html, /rel="icon" href="assets\/munilink-logo\.png"/);
 });
