@@ -21,7 +21,9 @@ test("all in-page navigation targets exist", () => {
 test("motion and rendering have accessible fallbacks", () => {
   assert.match(css, /prefers-reduced-motion:\s*reduce/);
   assert.match(css, /\.terrain\s*\{\s*display:\s*none/);
+  assert.match(js, /getContext\("webgl2"/);
   assert.match(js, /getContext\("webgl"/);
+  assert.match(js, /navigator\.connection\?\.saveData/);
 });
 
 test("key page sections and honest qualifiers are present", () => {
@@ -31,4 +33,11 @@ test("key page sections and honest qualifiers are present", () => {
   assert.match(html, /In progress/);
   assert.match(html, /Public pricing has not yet been published/);
   assert.match(html, /has not been provided yet/);
+});
+
+test("decision lens explains the audit gates without unsupported claims", () => {
+  assert.match(html, /class="page-shell decision-lens/);
+  assert.match(html, /Is the need specific\?/);
+  assert.match(html, /Are the conditions real\?/);
+  assert.match(html, /Can people stay accountable\?/);
 });
