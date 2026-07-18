@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en-ZA">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#020617" />
+    <meta name="description" content="MuniLink helps South African municipalities evaluate and implement practical AI with clear oversight." />
+    <title>MuniLink — Practical AI for local government</title>
+    <link rel="icon" href="assets/munilink-logo.png" type="image/png" />
+    <link rel="apple-touch-icon" href="assets/munilink-logo.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="reading-progress" aria-hidden="true"></div>
+
+    <header class="site-header" data-header>
+      <div class="nav-shell">
+        <a class="brand" href="#top" aria-label="MuniLink home">
+          <picture class="logo-emblem logo-emblem--nav" aria-hidden="true">
+            <source srcset="assets/munilink-logo.svg" type="image/svg+xml" />
+            <img src="assets/munilink-logo.png" alt="" width="1024" height="1024" fetchpriority="high" />
+          </picture>
+          <span class="brand-name">MuniLink</span>
+        </a>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation">
+          <span class="sr-only">Toggle navigation</span>
+          <span></span><span></span>
+        </button>
+        <nav id="primary-navigation" class="primary-nav" aria-label="Primary navigation">
+          <a href="#approach">Approach</a>
+          <a href="#services">Services</a>
+          <a href="#evidence">Evidence</a>
+          <a href="#pricing">Pricing</a>
+          <a class="nav-cta" href="#contact">Request an AI audit <span aria-hidden="true">↗</span></a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero" id="top" aria-labelledby="hero-title">
+        <canvas id="terrain" class="terrain" aria-hidden="true"></canvas>
+        <div class="hero-grain" aria-hidden="true"></div>
+        <div class="hero-beam" aria-hidden="true"></div>
+        <div class="hero-orbit hero-orbit--one" aria-hidden="true"></div>
+        <div class="hero-orbit hero-orbit--two" aria-hidden="true"></div>
+        <div class="hero-inner page-shell">
+          <div class="hero-copy">
+            <p class="eyebrow"><span></span> AI consulting &amp; audit · South Africa</p>
+            <h1 id="hero-title">Make AI useful.<br /><em>Keep public trust intact.</em></h1>
+            <p class="hero-lede">MuniLink helps municipalities find practical uses for AI, assess operational readiness, and move forward with clear human oversight.</p>
+            <div class="hero-actions">
+              <a class="button button--primary" href="#contact">Request an AI audit <span aria-hidden="true">↗</span></a>
+              <a class="text-link" href="#approach">See the audit approach <span aria-hidden="true">↓</span></a>
+            </div>
+            <p class="hero-note">Built for municipal realities—not a generic technology playbook.</p>
+            <div class="hero-proof" aria-label="MuniLink engagement principles">
+              <span><i aria-hidden="true"></i>Context before tooling</span>
+              <span><i aria-hidden="true"></i>Humans remain accountable</span>
+              <span><i aria-hidden="true"></i>Evidence at every gate</span>
+            </div>
+          </div>
+
+          <div class="signal-stage" data-tilt>
+            <span class="signal-tag signal-tag--one" aria-hidden="true">Operational context</span>
+            <span class="signal-tag signal-tag--two" aria-hidden="true">Oversight layer</span>
+            <div class="signal-halo" aria-hidden="true"></div>
+          <div class="signal-panel" aria-label="Illustration of a municipal AI readiness scan">
+            <span class="hud-corner hud-corner--tl" aria-hidden="true"></span>
+            <span class="hud-corner hud-corner--tr" aria-hidden="true"></span>
+            <span class="hud-corner hud-corner--bl" aria-hidden="true"></span>
+            <span class="hud-corner hud-corner--br" aria-hidden="true"></span>
+            <div class="signal-panel__top">
+              <div><span class="status-dot"></span> Municipal readiness field</div>
+              <span>ML / ZA · 01</span>
+            </div>
+            <div class="signal-map" aria-hidden="true">
+              <svg viewBox="0 0 520 420" role="presentation">
+                <defs>
+                  <filter id="glow"><feGaussianBlur stdDeviation="5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                  <linearGradient id="coast" x1="0" x2="1"><stop stop-color="#0e7490"/><stop offset=".55" stop-color="#22d3ee"/><stop offset="1" stop-color="#67e8f9"/></linearGradient>
+                </defs>
+                <path class="map-grid" d="M40 40H480M40 100H480M40 160H480M40 220H480M40 280H480M40 340H480M100 20V390M180 20V390M260 20V390M340 20V390M420 20V390" />
+                <path class="coastline" d="M74 80C115 47 171 37 221 51c46 13 74 2 115 21 39 18 60 51 89 73 23 18 41 27 44 49 5 34-37 59-48 92-12 35-14 78-52 97-42 22-85-9-118-30-41-27-80-49-106-90-20-32-19-75-50-100-25-20-50-49-21-83Z" />
+                <path class="boundary" d="M105 121c43 31 83 29 116 4m-72 136c44-39 108-36 146-83m8 174c-3-49 29-89 80-113m-155-185c3 48-29 72-12 112 11 26 42 43 42 76 0 34-29 61-19 100m58-269c-21 37-16 73 15 95 29 21 50 49 48 85" />
+                <g class="map-points" filter="url(#glow)">
+                  <circle cx="132" cy="132" r="4"/><circle cx="206" cy="89" r="3"/><circle cx="328" cy="113" r="4"/><circle cx="397" cy="175" r="3"/><circle cx="376" cy="284" r="4"/><circle cx="291" cy="344" r="3"/><circle cx="174" cy="286" r="4"/>
+                </g>
+              </svg>
+              <div class="scan-line"></div>
+              <span class="map-readout map-readout--one">Need</span>
+              <span class="map-readout map-readout--two">Readiness</span>
+              <span class="map-readout map-readout--three">Control</span>
+            </div>
+            <div class="signal-panel__bottom">
+              <div><span>01 / Focus</span><strong>Service delivery</strong></div>
+              <div><span>02 / Method</span><strong>Evidence first</strong></div>
+              <div><span>03 / Control</span><strong>Human led</strong></div>
+            </div>
+          </div>
+          </div>
+        </div>
+        <div class="hero-watermark" aria-hidden="true">M</div>
+      </section>
+
+      <aside class="trust-rail" aria-label="MuniLink operating principles">
+        <div class="page-shell trust-rail__inner">
+          <p>Designed for public-sector decisions</p>
+          <div class="trust-items">
+            <span><i>01</i> Local context</span>
+            <span><i>02</i> Clear evidence</span>
+            <span><i>03</i> Human oversight</span>
+            <span><i>04</i> Practical delivery</span>
+          </div>
+        </div>
+      </aside>
+
+      <section class="statement section-light" aria-labelledby="statement-title">
+        <div class="page-shell statement-grid reveal">
+          <div>
+            <p class="section-kicker">The starting point</p>
+            <p class="folio">01 / 06</p>
+          </div>
+          <div>
+            <h2 id="statement-title">Start with the municipal decision.<br />Not the technology.</h2>
+            <p>AI creates value only when it answers a real operational need, fits the way officials work, and can be explained to every stakeholder who needs to approve it.</p>
+          </div>
+        </div>
+        <div class="page-shell decision-lens reveal" aria-label="MuniLink decision lens">
+          <article>
+            <span>01</span>
+            <div><small>Question</small><h3>Is the need specific?</h3></div>
+            <p>Begin with a service, workflow, or decision—not a technology category.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <div><small>Evidence</small><h3>Are the conditions real?</h3></div>
+            <p>Test data, process, risk, and organisational readiness before recommending action.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <div><small>Control</small><h3>Can people stay accountable?</h3></div>
+            <p>Make roles, safeguards, and decision rights visible from the outset.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="process section-light" id="approach" aria-labelledby="process-title">
+        <div class="page-shell">
+          <header class="section-heading reveal">
+            <div><p class="section-kicker">How it works</p><p class="folio">02 / 06</p></div>
+            <div><h2 id="process-title">A clear path from question<br />to accountable action.</h2><p>Each phase produces something decision-makers can review. No black box, no leap of faith.</p></div>
+          </header>
+
+          <ol class="process-list">
+            <li class="process-item reveal">
+              <span class="process-number">01</span>
+              <div class="process-title"><span class="process-icon">⌁</span><h3>Frame the need</h3></div>
+              <p>Identify the service, workflow, or decision that needs attention—and the people affected by it.</p>
+              <span class="process-meta"><i></i>Context</span>
+            </li>
+            <li class="process-item reveal">
+              <span class="process-number">02</span>
+              <div class="process-title"><span class="process-icon">◎</span><h3>Audit readiness</h3></div>
+              <p>Review the available data, current process, constraints, risks, and practical conditions for adoption.</p>
+              <span class="process-meta"><i></i>Evidence</span>
+            </li>
+            <li class="process-item reveal">
+              <span class="process-number">03</span>
+              <div class="process-title"><span class="process-icon">◇</span><h3>Design the response</h3></div>
+              <p>Define a proportionate solution with explicit roles, controls, and success criteria.</p>
+              <span class="process-meta"><i></i>Plan</span>
+            </li>
+            <li class="process-item reveal">
+              <span class="process-number">04</span>
+              <div class="process-title"><span class="process-icon">↗</span><h3>Build and transfer</h3></div>
+              <p>Develop the right tooling, document how it works, and equip municipal teams to oversee it.</p>
+              <span class="process-meta"><i></i>Delivery</span>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="services section-dark" id="services" aria-labelledby="services-title">
+        <div class="service-glow" aria-hidden="true"></div>
+        <div class="page-shell">
+          <header class="section-heading section-heading--dark reveal">
+            <div><p class="section-kicker">What MuniLink does</p><p class="folio">03 / 06</p></div>
+            <div><h2 id="services-title">Capability where it matters.<br />Restraint where it counts.</h2><p>Support can begin with an audit and extend into purpose-built tools and responsible adoption.</p></div>
+          </header>
+          <div class="service-grid">
+            <article class="service-card service-card--featured reveal" data-spotlight>
+              <div class="card-index">01 <span>Primary engagement</span></div>
+              <div class="service-symbol" aria-hidden="true"><span></span><span></span><span></span></div>
+              <div><h3>Municipal AI audit</h3><p>A structured view of where AI could help, where it should not be used, and what needs to be true before moving forward.</p></div>
+              <ul><li>Opportunity framing</li><li>Readiness assessment</li><li>Risk and oversight review</li></ul>
+            </article>
+            <article class="service-card reveal" data-spotlight>
+              <div class="card-index">02</div>
+              <div class="service-glyph" aria-hidden="true">⌘</div>
+              <div><h3>Agent &amp; tool design</h3><p>Focused internal tools that support real workflows without removing accountable human judgment.</p></div>
+              <ul><li>Workflow mapping</li><li>Prototype development</li><li>Operational documentation</li></ul>
+            </article>
+            <article class="service-card reveal" data-spotlight>
+              <div class="card-index">03</div>
+              <div class="service-glyph" aria-hidden="true">◌</div>
+              <div><h3>Advisory &amp; enablement</h3><p>Clear guidance for leadership and delivery teams navigating a fast-moving technology landscape.</p></div>
+              <ul><li>Decision support</li><li>Implementation guidance</li><li>Team enablement</li></ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="evidence section-light" id="evidence" aria-labelledby="evidence-title">
+        <div class="page-shell">
+          <header class="section-heading reveal">
+            <div><p class="section-kicker">Work in context</p><p class="folio">04 / 06</p></div>
+            <div><h2 id="evidence-title">Evidence, without overclaiming.</h2><p>Municipal work deserves accurate reporting. MuniLink shares the stage an engagement has reached—not outcomes that have not yet been proven.</p></div>
+          </header>
+          <article class="case-file reveal">
+            <div class="case-file__visual">
+              <div class="case-stamp">Engagement note<br /><strong>In progress</strong></div>
+              <div class="case-wave" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+              <div class="case-coordinate" aria-hidden="true"><span>ZA / COAST</span><span>ENGAGEMENT 001</span></div>
+              <p>Coastal municipality<br /><span>South Africa</span></p>
+            </div>
+            <div class="case-file__content">
+              <div class="case-label"><span>Current pipeline</span><span>Reference 001</span></div>
+              <h3>An early municipal engagement, reported at the right level of certainty.</h3>
+              <p>A proposal and follow-up have been sent to a coastal municipality. The engagement is still developing, so no client identity or outcome is published.</p>
+              <div class="milestones" aria-label="Engagement progress">
+                <div class="milestone is-complete"><i>✓</i><span><strong>Context reviewed</strong><small>Complete</small></span></div>
+                <div class="milestone is-complete"><i>✓</i><span><strong>Proposal prepared</strong><small>Complete</small></span></div>
+                <div class="milestone is-current"><i>↗</i><span><strong>Follow-up underway</strong><small>Current stage</small></span></div>
+                <div class="milestone"><i>—</i><span><strong>Outcome</strong><small>Not yet reported</small></span></div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="pricing section-mist" id="pricing" aria-labelledby="pricing-title">
+        <div class="page-shell pricing-grid reveal">
+          <div>
+            <p class="section-kicker">Engagement &amp; pricing</p>
+            <p class="folio">05 / 06</p>
+          </div>
+          <div class="pricing-copy">
+            <h2 id="pricing-title">Scope should be understood before a number is attached to it.</h2>
+            <p>Public pricing has not yet been published. Start with the municipal need, then request a clearly defined audit conversation.</p>
+            <a class="button button--dark" href="#contact">Request an AI audit <span aria-hidden="true">↗</span></a>
+          </div>
+          <div class="scope-card">
+            <p>Every conversation begins with</p>
+            <ul>
+              <li><span>01</span>A defined operational question</li>
+              <li><span>02</span>The relevant stakeholders</li>
+              <li><span>03</span>Known constraints and risks</li>
+            </ul>
+            <small>No invented tiers. No hidden claims.</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="resources section-light" aria-labelledby="resources-title">
+        <div class="page-shell">
+          <header class="section-heading reveal">
+            <div><p class="section-kicker">Resources</p><p class="folio">06 / 06</p></div>
+            <div><h2 id="resources-title">Useful thinking for responsible adoption.</h2><p>MuniLink’s resource library is being developed around the questions municipal leaders need to answer first.</p></div>
+          </header>
+          <div class="resource-list reveal">
+            <article><span>Field note · Forthcoming</span><h3>Before the AI pilot: five questions for a municipal team</h3><i aria-hidden="true">↗</i></article>
+            <article><span>Briefing · Forthcoming</span><h3>Human oversight is an operating model, not a disclaimer</h3><i aria-hidden="true">↗</i></article>
+            <article><span>Checklist · Forthcoming</span><h3>What makes a workflow ready for responsible automation?</h3><i aria-hidden="true">↗</i></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="contact" id="contact" aria-labelledby="contact-title">
+        <div class="contact-grid" aria-hidden="true"></div>
+        <div class="contact-glow" aria-hidden="true"></div>
+        <div class="page-shell contact-inner reveal">
+          <picture class="logo-emblem logo-emblem--large" aria-hidden="true">
+            <source srcset="assets/munilink-logo.svg" type="image/svg+xml" />
+            <img src="assets/munilink-logo.png" alt="" width="1024" height="1024" loading="lazy" decoding="async" />
+          </picture>
+          <p class="eyebrow"><span></span> Begin with one useful question</p>
+          <h2 id="contact-title">What should AI make<br /><em>simpler for your municipality?</em></h2>
+          <p>Share the operational challenge. MuniLink will begin with the context, the constraints, and the people responsible for the outcome.</p>
+          <button class="button button--primary button--large" type="button" data-open-dialog>Request an AI audit <span aria-hidden="true">↗</span></button>
+          <small>Contact details are being prepared for publication.</small>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="page-shell footer-top">
+        <a class="brand" href="#top" aria-label="MuniLink home">
+          <picture class="logo-emblem logo-emblem--nav" aria-hidden="true">
+            <source srcset="assets/munilink-logo.svg" type="image/svg+xml" />
+            <img src="assets/munilink-logo.png" alt="" width="1024" height="1024" loading="lazy" decoding="async" />
+          </picture>
+          <span class="brand-name">MuniLink</span>
+        </a>
+        <p>Practical AI consulting and audit<br />for South African local government.</p>
+        <nav aria-label="Footer navigation"><a href="#approach">Approach</a><a href="#services">Services</a><a href="#evidence">Evidence</a><a href="#pricing">Pricing</a></nav>
+      </div>
+      <div class="page-shell footer-bottom"><span>© <span data-year></span> MuniLink</span><span>South Africa</span><span>Built for public trust</span></div>
+    </footer>
+
+    <dialog class="contact-dialog" data-dialog aria-labelledby="dialog-title">
+      <button class="dialog-close" type="button" data-close-dialog aria-label="Close dialog">×</button>
+      <picture class="logo-emblem logo-emblem--dialog" aria-hidden="true">
+        <source srcset="assets/munilink-logo.svg" type="image/svg+xml" />
+        <img src="assets/munilink-logo.png" alt="" width="1024" height="1024" loading="lazy" decoding="async" />
+      </picture>
+      <p class="section-kicker">Request an AI audit</p>
+      <h2 id="dialog-title">The contact channel is almost ready.</h2>
+      <p>MuniLink’s public email or booking link has not been provided yet, so this site won’t invent one. Add the approved contact destination to activate this request.</p>
+      <button class="button button--dark" type="button" data-close-dialog>Return to the site</button>
+    </dialog>
+  </body>
+</html>
