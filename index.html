@@ -285,7 +285,7 @@
           <h2 id="contact-title">What should AI make<br /><em>simpler for your municipality?</em></h2>
           <p>Share the operational challenge. MuniLink will begin with the context, the constraints, and the people responsible for the outcome.</p>
           <button class="button button--primary button--large" type="button" data-open-dialog>Request an AI audit <span aria-hidden="true">↗</span></button>
-          <small>Contact details are being prepared for publication.</small>
+          <small>Requests are sent to munilink.agency@gmail.com.</small>
         </div>
       </section>
     </main>
@@ -305,16 +305,83 @@
       <div class="page-shell footer-bottom"><span>© <span data-year></span> MuniLink</span><span>South Africa</span><span>Built for public trust</span></div>
     </footer>
 
-    <dialog class="contact-dialog" data-dialog aria-labelledby="dialog-title">
+    <dialog class="contact-dialog" data-dialog aria-labelledby="dialog-title" aria-describedby="dialog-description">
       <button class="dialog-close" type="button" data-close-dialog aria-label="Close dialog">×</button>
-      <picture class="logo-emblem logo-emblem--dialog" aria-hidden="true">
-        <source srcset="assets/munilink-logo.svg" type="image/svg+xml" />
-        <img src="assets/munilink-logo.png" alt="" width="1024" height="1024" loading="lazy" decoding="async" />
-      </picture>
-      <p class="section-kicker">Request an AI audit</p>
-      <h2 id="dialog-title">The contact channel is almost ready.</h2>
-      <p>MuniLink’s public email or booking link has not been provided yet, so this site won’t invent one. Add the approved contact destination to activate this request.</p>
-      <button class="button button--dark" type="button" data-close-dialog>Return to the site</button>
+      <div class="audit-form-shell" data-form-shell>
+        <header class="audit-form-header">
+          <picture class="logo-emblem logo-emblem--dialog" aria-hidden="true">
+            <source srcset="assets/munilink-logo.svg" type="image/svg+xml" />
+            <img src="assets/munilink-logo.png" alt="" width="1024" height="1024" loading="lazy" decoding="async" />
+          </picture>
+          <div>
+            <p class="section-kicker">Request an AI audit</p>
+            <h2 id="dialog-title">Start with the right context.</h2>
+            <p id="dialog-description">Tell us who you are, what needs attention, and when a call could suit you.</p>
+          </div>
+        </header>
+
+        <ol class="form-progress" aria-label="Application progress">
+          <li class="is-current" data-progress-step><span>01</span> Your details</li>
+          <li data-progress-step><span>02</span> Audit context</li>
+          <li data-progress-step><span>03</span> Call preference</li>
+        </ol>
+
+        <form class="audit-form" action="https://formsubmit.co/munilink.agency@gmail.com" method="POST" data-ajax-action="https://formsubmit.co/ajax/munilink.agency@gmail.com" data-audit-form>
+          <input type="hidden" name="_subject" value="New MuniLink AI audit request" />
+          <input type="hidden" name="_template" value="table" />
+          <input type="hidden" name="_url" value="" data-form-url />
+          <div class="form-honey" aria-hidden="true">
+            <label for="audit-website">Leave this field empty</label>
+            <input id="audit-website" type="text" name="_honey" tabindex="-1" autocomplete="off" />
+          </div>
+
+          <fieldset class="form-step" data-form-step>
+            <legend class="sr-only">Step 1 of 3: Your details</legend>
+            <div class="form-step-heading"><span>01</span><div><h3>Your details</h3><p>Who should MuniLink respond to?</p></div></div>
+            <div class="field-grid">
+              <label class="field"><span>Full name <i>*</i></span><input type="text" name="Full name" autocomplete="name" required /></label>
+              <label class="field"><span>Work email <i>*</i></span><input type="email" name="email" autocomplete="email" inputmode="email" required /></label>
+              <label class="field"><span>Municipality or organisation <i>*</i></span><input type="text" name="Municipality or organisation" autocomplete="organization" required /></label>
+              <label class="field"><span>Role or title <i>*</i></span><input type="text" name="Role or title" autocomplete="organization-title" required /></label>
+              <label class="field field--wide"><span>Phone number <small>Optional</small></span><input type="tel" name="Phone number" autocomplete="tel" inputmode="tel" /></label>
+            </div>
+            <div class="form-actions form-actions--end"><button class="button button--dark" type="button" data-next-step>Continue <span aria-hidden="true">→</span></button></div>
+          </fieldset>
+
+          <fieldset class="form-step" data-form-step>
+            <legend class="sr-only">Step 2 of 3: Audit context</legend>
+            <div class="form-step-heading"><span>02</span><div><h3>Audit context</h3><p>A short operational view is enough to begin.</p></div></div>
+            <div class="field-grid">
+              <label class="field field--wide"><span>What should the audit focus on? <i>*</i></span><select name="Audit focus" required><option value="">Select a focus</option><option>Service delivery or public-facing workflow</option><option>Internal administration or operations</option><option>Data, records, or reporting</option><option>Responsible AI governance and oversight</option><option>Not sure yet</option><option>Other</option></select></label>
+              <label class="field field--wide"><span>What challenge or opportunity should we understand? <i>*</i></span><textarea name="Operational challenge" rows="5" minlength="30" placeholder="Describe the current process, the people involved, and what needs to improve." required></textarea></label>
+            </div>
+            <p class="form-note"><span aria-hidden="true">ⓘ</span> Please do not include confidential records or personal resident data.</p>
+            <div class="form-actions"><button class="text-button" type="button" data-prev-step>← Back</button><button class="button button--dark" type="button" data-next-step>Continue <span aria-hidden="true">→</span></button></div>
+          </fieldset>
+
+          <fieldset class="form-step" data-form-step>
+            <legend class="sr-only">Step 3 of 3: Call preference</legend>
+            <div class="form-step-heading"><span>03</span><div><h3>Call preference</h3><p>Choose a suitable window. MuniLink will confirm the exact time by email.</p></div></div>
+            <div class="field-grid">
+              <label class="field"><span>Preferred date <i>*</i></span><input type="date" name="Preferred call date" data-date-input required /></label>
+              <label class="field"><span>Preferred time <i>*</i></span><select name="Preferred call window (SAST)" required><option value="">Select a window</option><option>09:00–12:00 SAST</option><option>13:00–16:00 SAST</option><option>Flexible during business hours</option></select></label>
+              <label class="field field--wide"><span>Alternative date <small>Optional</small></span><input type="date" name="Alternative call date" data-date-input /></label>
+              <label class="consent field--wide"><input type="checkbox" name="Contact consent" value="Yes" required /><span>I agree that MuniLink may contact me about this audit request.</span></label>
+            </div>
+            <p class="form-note"><span aria-hidden="true">◷</span> This requests a call; it does not confirm a booking.</p>
+            <p class="form-error" role="alert" data-form-error hidden>We could not send the request. Please try again or email <a href="mailto:munilink.agency@gmail.com">munilink.agency@gmail.com</a>.</p>
+            <div class="form-actions"><button class="text-button" type="button" data-prev-step>← Back</button><button class="button button--primary" type="submit" data-submit-button>Send audit request <span aria-hidden="true">↗</span></button></div>
+          </fieldset>
+        </form>
+
+        <section class="form-success" data-form-success hidden aria-labelledby="success-title" aria-live="polite">
+          <span class="success-mark" aria-hidden="true">✓</span>
+          <p class="section-kicker">Request received</p>
+          <h3 id="success-title" tabindex="-1">Thank you. Your context is on its way to MuniLink.</h3>
+          <p>We’ll review the request and reply by email to confirm a suitable call time.</p>
+          <button class="button button--dark" type="button" data-close-dialog>Return to the site</button>
+        </section>
+      </div>
     </dialog>
   </body>
 </html>

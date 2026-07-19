@@ -41,7 +41,7 @@ test("key page sections and honest qualifiers are present", () => {
   }
   assert.match(html, /In progress/);
   assert.match(html, /Public pricing has not yet been published/);
-  assert.match(html, /has not been provided yet/);
+  assert.match(html, /does not confirm a booking/);
 });
 
 test("decision lens explains the audit gates without unsupported claims", () => {
@@ -69,4 +69,16 @@ test("brand fonts are self-hosted with swap and system fallbacks", () => {
   assert.match(css, /--display:\s*"Outfit",\s*system-ui,\s*sans-serif/);
   assert.match(css, /--body:\s*"Inter",\s*system-ui,\s*sans-serif/);
   assert.match(server, /"\.woff2":\s*"font\/woff2"/);
+});
+
+test("audit requests collect context and route to the approved inbox", () => {
+  assert.match(html, /action="https:\/\/formsubmit\.co\/munilink\.agency@gmail\.com"/);
+  assert.match(html, /data-ajax-action="https:\/\/formsubmit\.co\/ajax\/munilink\.agency@gmail\.com"/);
+  assert.match(html, /name="Municipality or organisation"[^>]+required/);
+  assert.match(html, /name="Operational challenge"[^>]+required/);
+  assert.match(html, /name="Preferred call date"[^>]+required/);
+  assert.match(html, /name="Contact consent"[^>]+required/);
+  assert.match(html, /name="_honey"/);
+  assert.match(js, /fetch\(auditForm\.dataset\.ajaxAction/);
+  assert.match(js, /new FormData\(auditForm\)/);
 });

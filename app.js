@@ -32,8 +32,37 @@ navigation?.addEventListener("click", (event) => {
 });
 
 const dialog = document.querySelector("[data-dialog]");
+const auditForm = dialog?.querySelector("[data-audit-form]");
+const formSteps = [...(dialog?.querySelectorAll("[data-form-step]") || [])];
+const progressSteps = [...(dialog?.querySelectorAll("[data-progress-step]") || [])];
+const formSuccess = dialog?.querySelector("[data-form-success]");
+let activeFormStep = 0;
+
+const showFormStep = (index) => {
+  activeFormStep = Math.max(0, Math.min(index, formSteps.length - 1));
+  formSteps.forEach((step, stepIndex) => { step.hidden = stepIndex !== activeFormStep; });
+  progressSteps.forEach((step, stepIndex) => {
+    step.classList.toggle("is-current", stepIndex === activeFormStep);
+    step.classList.toggle("is-complete", stepIndex < activeFormStep);
+    if (stepIndex === activeFormStep) step.setAttribute("aria-current", "step");
+    else step.removeAttribute("aria-current");
+  });
+};
+
+const resetAuditForm = () => {
+  auditForm?.reset();
+  auditForm?.removeAttribute("hidden");
+  if (formSuccess) formSuccess.hidden = true;
+  const error = auditForm?.querySelector("[data-form-error]");
+  if (error) error.hidden = true;
+  showFormStep(0);
+};
+
 document.querySelectorAll("[data-open-dialog]").forEach((button) => {
-  button.addEventListener("click", () => transition(() => dialog?.showModal()));
+  button.addEventListener("click", () => {
+    resetAuditForm();
+    transition(() => dialog?.showModal());
+  });
 });
 document.querySelectorAll("[data-close-dialog]").forEach((button) => {
   button.addEventListener("click", () => transition(() => dialog?.close()));
@@ -41,6 +70,64 @@ document.querySelectorAll("[data-close-dialog]").forEach((button) => {
 dialog?.addEventListener("click", (event) => {
   if (event.target === dialog) transition(() => dialog.close());
 });
+
+formSteps.forEach((step, index) => {
+  step.querySelector("[data-next-step]")?.addEventListener("click", () => {
+    const fields = [...step.querySelectorAll("input, select, textarea")];
+    const invalidField = fields.find((field) => !field.checkValidity());
+    if (invalidField) {
+      invalidField.reportValidity();
+      return;
+    }
+    transition(() => showFormStep(index + 1));
+    formSteps[index + 1]?.querySelector("input, select, textarea")?.focus();
+  });
+  step.querySelector("[data-prev-step]")?.addEventListener("click", () => {
+    transition(() => showFormStep(index - 1));
+    formSteps[index - 1]?.querySelector("input, select, textarea")?.focus();
+  });
+});
+
+dialog?.querySelectorAll("[data-date-input]").forEach((input) => {
+  input.min = new Intl.DateTimeFormat("en-CA").format(new Date());
+});
+const formUrl = auditForm?.querySelector("[data-form-url]");
+if (formUrl) formUrl.value = window.location.href;
+
+auditForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (!auditForm.reportValidity()) return;
+
+  const submitButton = auditForm.querySelector("[data-submit-button]");
+  const error = auditForm.querySelector("[data-form-error]");
+  const originalLabel = submitButton.innerHTML;
+  submitButton.disabled = true;
+  submitButton.textContent = "Sending request…";
+  error.hidden = true;
+
+  try {
+    const response = await fetch(auditForm.dataset.ajaxAction, {
+      method: "POST",
+      body: new FormData(auditForm),
+      headers: { Accept: "application/json" },
+    });
+    const result = await response.json();
+    if (!response.ok || result.success === false) throw new Error("Submission failed");
+    transition(() => {
+      auditForm.hidden = true;
+      formSuccess.hidden = false;
+      formSuccess.querySelector("h3")?.focus?.();
+    });
+  } catch {
+    error.hidden = false;
+    error.focus?.();
+  } finally {
+    submitButton.disabled = false;
+    submitButton.innerHTML = originalLabel;
+  }
+});
+
+showFormStep(0);
 
 document.querySelector("[data-year]").textContent = new Date().getFullYear();
 
