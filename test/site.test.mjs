@@ -5,8 +5,15 @@ import test from "node:test";
 const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
 const css = await readFile(new URL("../styles.css", import.meta.url), "utf8");
 const js = await readFile(new URL("../app.js", import.meta.url), "utf8");
+const server = await readFile(new URL("../scripts/server.mjs", import.meta.url), "utf8");
 const logoSvg = await readFile(new URL("../assets/munilink-logo.svg", import.meta.url));
 const logoPng = await readFile(new URL("../assets/munilink-logo.png", import.meta.url));
+const localFonts = await Promise.all([
+  "inter/inter-latin.woff2",
+  "inter/inter-latin-ext.woff2",
+  "outfit/outfit-latin.woff2",
+  "outfit/outfit-latin-ext.woff2",
+].map((file) => readFile(new URL(`../assets/fonts/${file}`, import.meta.url))));
 
 test("page exposes a single h1 and labelled primary navigation", () => {
   assert.equal((html.match(/<h1\b/g) || []).length, 1);
@@ -34,7 +41,7 @@ test("key page sections and honest qualifiers are present", () => {
   }
   assert.match(html, /In progress/);
   assert.match(html, /Public pricing has not yet been published/);
-  assert.match(html, /has not been provided yet/);
+  assert.match(html, /does not confirm a booking/);
 });
 
 test("decision lens explains the audit gates without unsupported claims", () => {
@@ -50,4 +57,28 @@ test("supplied MuniLink branding is used with a resilient image fallback", () =>
   assert.match(html, /srcset="assets\/munilink-logo\.svg"/);
   assert.match(html, /src="assets\/munilink-logo\.png"/);
   assert.match(html, /rel="icon" href="assets\/munilink-logo\.png"/);
+});
+
+test("brand fonts are self-hosted with swap and system fallbacks", () => {
+  assert.ok(localFonts.every((font) => font.length > 0));
+  assert.doesNotMatch(html, /fonts\.(?:googleapis|gstatic)\.com/);
+  assert.match(html, /rel="preload" href="assets\/fonts\/inter\/inter-latin\.woff2"/);
+  assert.match(html, /rel="preload" href="assets\/fonts\/outfit\/outfit-latin\.woff2"/);
+  assert.match(css, /font-family:\s*"Inter";[\s\S]*?font-display:\s*swap;[\s\S]*?inter-latin\.woff2/);
+  assert.match(css, /font-family:\s*"Outfit";[\s\S]*?font-display:\s*swap;[\s\S]*?outfit-latin\.woff2/);
+  assert.match(css, /--display:\s*"Outfit",\s*system-ui,\s*sans-serif/);
+  assert.match(css, /--body:\s*"Inter",\s*system-ui,\s*sans-serif/);
+  assert.match(server, /"\.woff2":\s*"font\/woff2"/);
+});
+
+test("audit requests collect context and route to the approved inbox", () => {
+  assert.match(html, /action="https:\/\/formsubmit\.co\/munilink\.agency@gmail\.com"/);
+  assert.match(html, /data-ajax-action="https:\/\/formsubmit\.co\/ajax\/munilink\.agency@gmail\.com"/);
+  assert.match(html, /name="Municipality or organisation"[^>]+required/);
+  assert.match(html, /name="Operational challenge"[^>]+required/);
+  assert.match(html, /name="Preferred call date"[^>]+required/);
+  assert.match(html, /name="Contact consent"[^>]+required/);
+  assert.match(html, /name="_honey"/);
+  assert.match(js, /fetch\(auditForm\.dataset\.ajaxAction/);
+  assert.match(js, /new FormData\(auditForm\)/);
 });
