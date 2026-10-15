@@ -1,3 +1,5 @@
+import { readIntake, submitIntake, validateIntake } from "./form.js";
+
 const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 const transition = (callback) => {
@@ -31,18 +33,53 @@ navigation?.addEventListener("click", (event) => {
   }
 });
 
-const dialog = document.querySelector("[data-dialog]");
-document.querySelectorAll("[data-open-dialog]").forEach((button) => {
-  button.addEventListener("click", () => transition(() => dialog?.showModal()));
-});
-document.querySelectorAll("[data-close-dialog]").forEach((button) => {
-  button.addEventListener("click", () => transition(() => dialog?.close()));
-});
-dialog?.addEventListener("click", (event) => {
-  if (event.target === dialog) transition(() => dialog.close());
+// ---- Discovery-call intake form (mailto now, FORM_ENDPOINT later) ----
+const form = document.querySelector("[data-intake-form]");
+const thanks = document.querySelector("[data-intake-thanks]");
+
+const showErrors = (errors) => {
+  form.querySelectorAll("[aria-invalid]").forEach((el) => el.removeAttribute("aria-invalid"));
+  form.querySelectorAll(".field-error").forEach((el) => { el.textContent = ""; });
+  let first = null;
+  for (const [name, message] of Object.entries(errors)) {
+    const inputs = form.querySelectorAll(`[name="${name}"]`);
+    inputs.forEach((input) => input.setAttribute("aria-invalid", "true"));
+    const holder = document.getElementById(`e-${name}`);
+    if (holder) holder.textContent = message;
+    first ??= inputs[0];
+  }
+  first?.focus();
+};
+
+form?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const data = readIntake(new FormData(form));
+  const errors = validateIntake(data);
+  showErrors(errors);
+  if (Object.keys(errors).length) return;
+
+  const button = form.querySelector('[type="submit"]');
+  button.disabled = true;
+  try {
+    const result = await submitIntake(data);
+    thanks.querySelector("[data-mailto-fallback]")?.setAttribute("href", result.url);
+    if (result.method === "mailto") {
+      window.location.href = result.url;
+    } else {
+      thanks.querySelector("h3").textContent = result.ok ? "Thank you. Your request has been sent." : "Something went wrong sending the form.";
+      thanks.querySelector("[data-thanks-message]").textContent = result.ok
+        ? "We will reply by email to agree a time for the call."
+        : "Please use the email link below instead, and your details will be filled in.";
+    }
+    transition(() => { form.hidden = true; thanks.hidden = false; thanks.focus(); });
+  } finally {
+    button.disabled = false;
+  }
 });
 
-document.querySelector("[data-year]").textContent = new Date().getFullYear();
+document.querySelectorAll("[data-print]").forEach((button) => button.addEventListener("click", () => window.print()));
+
+document.querySelectorAll("[data-year]").forEach((node) => { node.textContent = new Date().getFullYear(); });
 
 class TopographicShader {
   constructor(canvas) {
