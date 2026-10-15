@@ -77,6 +77,7 @@ form?.addEventListener("submit", async (event) => {
     if (result.method === "mailto") {
       thanks.querySelector("h3").textContent = "Almost done: send the email that just opened.";
       thanks.querySelector("[data-thanks-message]").textContent = "Your email app should have opened with your details filled in. Send it, and we will reply to agree a time for the call.";
+      thanks.querySelector("[data-thanks-fallback]")?.removeAttribute("hidden");
       window.location.href = result.url;
     }
     transition(() => { form.hidden = true; thanks.hidden = false; thanks.focus(); });
