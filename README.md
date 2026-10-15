@@ -29,9 +29,7 @@ FormSubmit sends a one-time activation email to the inbox on the first submissio
 
 ## Booking link
 
-`BOOKING_URL` in `form.js` drives every "Book a 20-minute call" button (`data-booking`): hero,
-thank-you state and checklist page. It is `"#intake"` until the Cal.com link is ready; paste the
-`https://cal.com/...` URL there and the buttons open it in a new tab.
+`BOOKING_URL` in `form.js` (https://cal.com/munilink/munilink-discovery-call) drives every "Book a 20-minute call" button (`data-booking`): nav, hero, thank-you state and checklist page. They open Cal.com in a new tab; the intake form (`#intake`) stays as the "Or send us a note" route.
 
 ## Checklist capture
 
