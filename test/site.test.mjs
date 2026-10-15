@@ -139,16 +139,27 @@ test("intake form carries a hidden honeypot and no longer says it only opens ema
   assert.match(js, /submitIntake/);
 });
 
-test("BOOKING_URL constant drives every 'Book a 20-minute call' button", () => {
-  assert.equal(typeof BOOKING_URL, "string");
-  assert.ok(BOOKING_URL === "#intake" || /^https:\/\//.test(BOOKING_URL), "BOOKING_URL must be #intake or an https URL");
+test("BOOKING_URL (Cal.com) drives every 'Book a 20-minute call' button, opening in a new tab", () => {
+  assert.equal(BOOKING_URL, "https://cal.com/munilink/munilink-discovery-call");
+  const anchors = (page) => [...page.matchAll(/<a [^>]*data-booking[^>]*>/g)].map(([tag]) => tag);
+  for (const page of [html, checklist]) {
+    const tags = anchors(page);
+    assert.ok(tags.length > 0);
+    for (const tag of tags) {
+      assert.match(tag, new RegExp(`href="${BOOKING_URL}"`));
+      assert.match(tag, /target="_blank"/);
+      assert.match(tag, /rel="noopener noreferrer"/);
+    }
+  }
   const heroActions = html.match(/<div class="hero-actions">[\s\S]*?<\/div>/)[0];
   assert.match(heroActions, /data-booking>Book a 20-minute call/);
+  assert.match(heroActions, /href="#intake">Or send us a note</);
   const thanksBlock = html.slice(html.indexOf("data-intake-thanks"));
   assert.match(thanksBlock, /data-booking>Book a 20-minute call/);
+  assert.match(html, /data-thanks-fallback hidden/);
   assert.match(js, /\[data-booking\]/);
   assert.deepEqual(bookingLinkAttributes("#intake"), { href: "#intake" });
-  assert.deepEqual(bookingLinkAttributes("https://cal.com/munilink/20min"), { href: "https://cal.com/munilink/20min", target: "_blank", rel: "noopener noreferrer" });
+  assert.deepEqual(bookingLinkAttributes(BOOKING_URL), { href: BOOKING_URL, target: "_blank", rel: "noopener noreferrer" });
 });
 
 test("checklist capture form is optional, POPIA-consented and never gates the 15 items", async () => {
