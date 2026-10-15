@@ -3,16 +3,19 @@
 
 export const CONTACT_EMAIL = "munilink.agency@gmail.com";
 
-// Leave empty to use the no-backend mailto flow.
-// To switch to a form service later, paste its endpoint here, e.g.
-//   Formspree:    "https://formspree.io/f/abcdwxyz"   (JSON POST)
-//   Google Forms: "https://docs.google.com/forms/d/e/<FORM_ID>/formResponse"
-//                 and fill GOOGLE_FORM_ENTRY_IDS with each question's entry id.
-export const FORM_ENDPOINT = "";
+// Form backend: FormSubmit's AJAX endpoint (free, no account). Submissions arrive in
+// CONTACT_EMAIL. Set to "" to fall back to the no-backend mailto flow.
+export const FORM_ENDPOINT = "https://formsubmit.co/ajax/munilink.agency@gmail.com";
 
-export const GOOGLE_FORM_ENTRY_IDS = {
-  // name: "entry.1234567890",
-};
+// Booking link for "Book a 20-minute call" buttons. Paste the Cal.com URL here when it is ready,
+// e.g. "https://cal.com/munilink/20min". Until then it points at the intake form on this page.
+export const BOOKING_URL = "#intake";
+
+/** Attributes for a booking link: external URLs open in a new tab, in-page anchors do not. */
+export function bookingLinkAttributes(url = BOOKING_URL) {
+  const external = /^https?:\/\//i.test(url);
+  return external ? { href: url, target: "_blank", rel: "noopener noreferrer" } : { href: url };
+}
 
 export const FIELDS = [
   { name: "name", label: "Name", required: true },
@@ -85,24 +88,118 @@ export function buildMailtoUrl(data, to = CONTACT_EMAIL) {
   return `mailto:${to}?${query}`;
 }
 
-/**
- * Submit the intake. With no endpoint it returns the mailto URL for the caller to open.
- * With an endpoint it POSTs (JSON for Formspree-style services, form-encoded for Google Forms).
- */
-export async function submitIntake(data, { endpoint = FORM_ENDPOINT, fetchImpl = globalThis.fetch } = {}) {
-  if (!endpoint) return { method: "mailto", ok: true, url: buildMailtoUrl(data) };
+/** FormSubmit control fields shared by every form on the site. */
+export function formSubmitControls(subject) {
+  return { _subject: subject, _template: "table", _captcha: "false", _honey: "" };
+}
 
-  if (endpoint.includes("docs.google.com/forms")) {
-    const body = new URLSearchParams();
-    for (const [name, entry] of Object.entries(GOOGLE_FORM_ENTRY_IDS)) body.append(entry, data[name] === true ? "Yes" : data[name] ?? "");
-    await fetchImpl(endpoint, { method: "POST", mode: "no-cors", body });
-    return { method: "endpoint", ok: true, url: buildMailtoUrl(data) };
+export function buildFormSubmitSubject(data) {
+  return `New MuniLink discovery request – ${data.municipality || "municipality"}`;
+}
+
+/** JSON body for the FormSubmit AJAX endpoint. */
+export function buildIntakePayload(data) {
+  const payload = {};
+  for (const field of FIELDS) {
+    if (field.name === "consent") continue;
+    payload[field.label] = data[field.name] || "-";
   }
+  payload["POPIA consent"] = data.consent ? "Yes, I agree that MuniLink may use these details to respond to my enquiry." : "Not given";
+  payload.email = data.email; // FormSubmit uses "email" as the reply-to address
+  return { ...payload, ...formSubmitControls(buildFormSubmitSubject(data)), _honey: data._honey || "" };
+}
 
+/** POST JSON to a FormSubmit-style endpoint. Resolves true only when the service confirms success. */
+export async function postJson(endpoint, payload, fetchImpl = globalThis.fetch) {
   const response = await fetchImpl(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json", Accept: "application/json" },
-    body: JSON.stringify({ ...data, consent: Boolean(data.consent), _subject: buildSubject(data) }),
+    body: JSON.stringify(payload),
   });
-  return { method: "endpoint", ok: Boolean(response?.ok), url: buildMailtoUrl(data) };
+  if (!response?.ok) return false;
+  try {
+    const json = await response.json();
+    return json?.success === undefined ? true : String(json.success) === "true";
+  } catch {
+    return true;
+  }
+}
+
+/**
+ * Submit the intake. POSTs to FORM_ENDPOINT; if there is no endpoint, or the request fails,
+ * returns the prefilled mailto URL so the caller can open the visitor's email app instead.
+ */
+export async function submitIntake(data, { endpoint = FORM_ENDPOINT, fetchImpl = globalThis.fetch } = {}) {
+  const url = buildMailtoUrl(data);
+  if (!endpoint) return { method: "mailto", ok: true, url };
+  try {
+    const ok = await postJson(endpoint, buildIntakePayload(data), fetchImpl);
+    if (ok) return { method: "endpoint", ok: true, url };
+  } catch {
+    // network error, blocked request, etc. Fall through to mailto.
+  }
+  return { method: "mailto", ok: true, fallback: true, url };
+}
+
+// ---- Checklist capture (optional, never gates the checklist) ----
+
+export const CHECKLIST_FIELDS = [
+  { name: "name", label: "Name", required: true },
+  { name: "email", label: "Work email", required: true, type: "email" },
+  { name: "municipality", label: "Municipality", required: true },
+  { name: "consent", label: "POPIA consent", required: true, type: "checkbox" },
+];
+
+export function validateChecklistRequest(data) {
+  const errors = {};
+  for (const field of CHECKLIST_FIELDS) {
+    const value = data[field.name] ?? "";
+    if (field.required && (value === "" || value === false)) {
+      errors[field.name] = field.type === "checkbox"
+        ? "Please tick the box so we can email you."
+        : `Please enter your ${field.label.toLowerCase()}.`;
+      continue;
+    }
+    if (field.type === "email" && value && !EMAIL_PATTERN.test(value)) errors[field.name] = "Please enter a valid email address, like name@municipality.gov.za.";
+  }
+  return errors;
+}
+
+export function buildChecklistPayload(data) {
+  return {
+    Name: data.name,
+    "Work email": data.email,
+    Municipality: data.municipality,
+    Request: "Printable SCM award-file checklist + updates when AGSA guidance changes",
+    "POPIA consent": data.consent ? "Yes, email me the checklist and occasional updates. I can unsubscribe at any time." : "Not given",
+    email: data.email,
+    ...formSubmitControls(`Checklist request – ${data.municipality || "municipality"}`),
+    _honey: data._honey || "",
+  };
+}
+
+export function buildChecklistMailtoUrl(data, to = CONTACT_EMAIL) {
+  const subject = `Checklist request – ${data.municipality || "municipality"}`;
+  const body = [
+    "Hello Slyvester,",
+    "",
+    "Please email me the printable SCM award-file checklist and updates when AGSA guidance changes.",
+    "",
+    `Name: ${data.name || "-"}`,
+    `Work email: ${data.email || "-"}`,
+    `Municipality: ${data.municipality || "-"}`,
+    `POPIA consent: ${data.consent ? "Yes" : "Not given"}`,
+  ].join("\n");
+  return `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+export async function submitChecklistRequest(data, { endpoint = FORM_ENDPOINT, fetchImpl = globalThis.fetch } = {}) {
+  const url = buildChecklistMailtoUrl(data);
+  if (!endpoint) return { method: "mailto", ok: true, url };
+  try {
+    if (await postJson(endpoint, buildChecklistPayload(data), fetchImpl)) return { method: "endpoint", ok: true, url };
+  } catch {
+    // fall through
+  }
+  return { method: "mailto", ok: true, fallback: true, url };
 }
