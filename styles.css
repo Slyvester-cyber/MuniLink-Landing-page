@@ -584,3 +584,30 @@
 @media (max-width: 760px) {
   .trust-items span { white-space: normal; }
 }
+/* ===== Funnel additions: booking buttons, thank-you next steps, checklist capture ===== */
+@layer sections {
+  .button--ghost { color: var(--slate-100); background: rgb(255 255 255 / 4%); border: 1px solid rgb(148 163 184 / 38%); }
+  .button--ghost:hover { border-color: var(--cyan-400); background: rgb(34 211 238 / 8%); }
+  .button--ghost-light { color: var(--slate-800); background: transparent; border: 1px solid var(--slate-300); }
+  .button--ghost-light:hover { border-color: var(--cyan-600); }
+  .hp-field { position: absolute !important; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+  .thanks-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+  .intake-thanks .thanks-actions .button { margin-top: 0; }
+  .thanks-next { display: grid; gap: 10px; margin-top: 10px; padding-top: 16px; border-top: 1px solid var(--slate-200); color: var(--slate-600); font-size: .9rem; }
+  .thanks-next b { display: inline-block; min-width: 108px; color: var(--slate-900); }
+
+  .capture { max-width: 900px; margin-top: 40px; padding: clamp(22px, 4vw, 34px); border: 1px solid var(--slate-200); border-radius: 18px; background: white; }
+  .capture h2 { font-size: clamp(1.25rem, 2.2vw, 1.6rem); }
+  .capture > p { margin-top: 8px; color: var(--slate-600); font-size: .95rem; }
+  .capture-form { display: grid; gap: 14px; margin-top: 20px; }
+  .capture-form .field-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .capture-form .button { justify-self: start; }
+  .capture-status { color: var(--slate-700); font-size: .92rem; }
+  .capture-status:empty { display: none; }
+  .capture-status a { color: var(--cyan-700); text-decoration: underline; }
+}
+@media (max-width: 760px) {
+  .capture-form .field-row { grid-template-columns: 1fr; }
+  .capture-form .button, .thanks-actions .button { width: 100%; }
+}
+@media print { .capture { display: none !important; } }
