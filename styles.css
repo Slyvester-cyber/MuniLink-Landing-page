@@ -611,3 +611,4 @@
   .capture-form .button, .thanks-actions .button { width: 100%; }
 }
 @media print { .capture { display: none !important; } }
+@layer sections { .inline-book { color: var(--cyan-300); text-decoration: underline; text-underline-offset: 3px; } }
