@@ -7,9 +7,9 @@ export const CONTACT_EMAIL = "munilink.agency@gmail.com";
 // CONTACT_EMAIL. Set to "" to fall back to the no-backend mailto flow.
 export const FORM_ENDPOINT = "https://formsubmit.co/ajax/munilink.agency@gmail.com";
 
-// Booking link for "Book a 20-minute call" buttons. Paste the Cal.com URL here when it is ready,
-// e.g. "https://cal.com/munilink/20min". Until then it points at the intake form on this page.
-export const BOOKING_URL = "#intake";
+// Booking link (Cal.com, 20-minute MuniLink discovery call) for every "Book a 20-minute call"
+// button. External URLs open in a new tab. The intake form (#intake) stays as the "send us a note" route.
+export const BOOKING_URL = "https://cal.com/munilink/munilink-discovery-call";
 
 /** Attributes for a booking link: external URLs open in a new tab, in-page anchors do not. */
 export function bookingLinkAttributes(url = BOOKING_URL) {
