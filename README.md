@@ -20,16 +20,24 @@ npm test
 
 ## Intake form
 
-The form needs no backend. On submit it validates the fields, then opens the visitor's email
-app with a prefilled message to munilink.agency@gmail.com and shows a thank-you state linking
-to the checklist. The logic lives in `form.js` (pure functions, unit tested).
+On submit the form validates the fields, then POSTs them as JSON to FormSubmit's AJAX endpoint
+(`FORM_ENDPOINT` in `form.js`, free, no account), which emails them to munilink.agency@gmail.com
+with the subject "New MuniLink discovery request – {municipality}". A hidden `_honey` field
+catches bots. If the request fails (offline, blocked, form not activated) the visitor's email app
+opens with a prefilled message instead. Set `FORM_ENDPOINT = ""` to use only the mailto flow.
+FormSubmit sends a one-time activation email to the inbox on the first submission.
 
-To switch to a form service later, set `FORM_ENDPOINT` in `form.js`:
-- **Formspree**: `"https://formspree.io/f/<id>"` – the form is POSTed as JSON.
-- **Google Forms**: `"https://docs.google.com/forms/d/e/<FORM_ID>/formResponse"` and fill
-  `GOOGLE_FORM_ENTRY_IDS` with each question's `entry.<id>`.
+## Booking link
 
-When an endpoint is set, update the line under the submit button ("This opens your email app…").
+`BOOKING_URL` in `form.js` drives every "Book a 20-minute call" button (`data-booking`): hero,
+thank-you state and checklist page. It is `"#intake"` until the Cal.com link is ready; paste the
+`https://cal.com/...` URL there and the buttons open it in a new tab.
+
+## Checklist capture
+
+`checklist.html` keeps all 15 items open. An optional form ("Email me the printable version…")
+posts name, work email, municipality and POPIA consent to the same endpoint with the subject
+"Checklist request – {municipality}".
 
 ## Notes
 - Open Graph tags use the relative path `assets/og-image.png`; replace with an absolute URL once the domain is known.
