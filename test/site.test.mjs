@@ -2,8 +2,9 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
-  CONTACT_EMAIL, FORM_ENDPOINT, FIELDS, readIntake, validateIntake,
-  buildEmailBody, buildMailtoUrl, submitIntake,
+  CONTACT_EMAIL, FORM_ENDPOINT, FIELDS, BOOKING_URL, readIntake, validateIntake,
+  buildEmailBody, buildMailtoUrl, submitIntake, buildIntakePayload, bookingLinkAttributes,
+  validateChecklistRequest, buildChecklistPayload, submitChecklistRequest,
 } from "../form.js";
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
@@ -99,17 +100,75 @@ test("mailto URL is prefilled with every field and addressed to MuniLink", () =>
   assert.match(buildEmailBody(validIntake), /POPIA consent: Yes/);
 });
 
-test("FORM_ENDPOINT switch: mailto by default, POST when an endpoint is set", async () => {
-  assert.equal(FORM_ENDPOINT, "");
-  const local = await submitIntake(validIntake);
-  assert.equal(local.method, "mailto");
+test("FORM_ENDPOINT posts JSON to FormSubmit's AJAX endpoint with control fields", async () => {
+  assert.equal(FORM_ENDPOINT, "https://formsubmit.co/ajax/munilink.agency@gmail.com");
   let call;
-  const fakeFetch = async (url, options) => { call = { url, options }; return { ok: true }; };
-  const remote = await submitIntake(validIntake, { endpoint: "https://formspree.io/f/test", fetchImpl: fakeFetch });
-  assert.equal(remote.method, "endpoint");
-  assert.ok(remote.ok);
-  assert.equal(call.url, "https://formspree.io/f/test");
-  assert.equal(JSON.parse(call.options.body).municipality, validIntake.municipality);
+  const fakeFetch = async (url, options) => { call = { url, options }; return { ok: true, json: async () => ({ success: "true" }) }; };
+  const result = await submitIntake(validIntake, { fetchImpl: fakeFetch });
+  assert.deepEqual([result.method, result.ok], ["endpoint", true]);
+  assert.equal(call.url, FORM_ENDPOINT);
+  assert.equal(call.options.method, "POST");
+  assert.equal(call.options.headers["Content-Type"], "application/json");
+  assert.equal(call.options.headers.Accept, "application/json");
+  const body = JSON.parse(call.options.body);
+  assert.equal(body._subject, "New MuniLink discovery request \u2013 Example Local Municipality");
+  assert.equal(body._template, "table");
+  assert.equal(body._captcha, "false");
+  assert.equal(body._honey, "");
+  assert.equal(body.Municipality, validIntake.municipality);
+  assert.equal(body.email, validIntake.email);
+  assert.match(body["POPIA consent"], /^Yes/);
+  assert.equal(buildIntakePayload(validIntake)["Workflow area"], "SCM award files");
+});
+
+test("intake falls back to the prefilled mailto when the request fails or is rejected", async () => {
+  const offline = await submitIntake(validIntake, { fetchImpl: async () => { throw new TypeError("Failed to fetch"); } });
+  assert.deepEqual([offline.method, offline.fallback], ["mailto", true]);
+  assert.ok(offline.url.startsWith("mailto:munilink.agency@gmail.com?subject="));
+  const serverError = await submitIntake(validIntake, { fetchImpl: async () => ({ ok: false }) });
+  assert.equal(serverError.method, "mailto");
+  const notActivated = await submitIntake(validIntake, { fetchImpl: async () => ({ ok: true, json: async () => ({ success: "false", message: "This form needs Activation." }) }) });
+  assert.equal(notActivated.method, "mailto");
+  const noEndpoint = await submitIntake(validIntake, { endpoint: "" });
+  assert.equal(noEndpoint.method, "mailto");
+});
+
+test("intake form carries a hidden honeypot and no longer says it only opens email", () => {
+  assert.match(html, /class="hp-field" aria-hidden="true"[\s\S]*?name="_honey"[^>]*tabindex="-1"/);
+  assert.doesNotMatch(html, /This opens your email app with your details filled in/);
+  assert.match(js, /submitIntake/);
+});
+
+test("BOOKING_URL constant drives every 'Book a 20-minute call' button", () => {
+  assert.equal(typeof BOOKING_URL, "string");
+  assert.ok(BOOKING_URL === "#intake" || /^https:\/\//.test(BOOKING_URL), "BOOKING_URL must be #intake or an https URL");
+  const heroActions = html.match(/<div class="hero-actions">[\s\S]*?<\/div>/)[0];
+  assert.match(heroActions, /data-booking>Book a 20-minute call/);
+  const thanksBlock = html.slice(html.indexOf("data-intake-thanks"));
+  assert.match(thanksBlock, /data-booking>Book a 20-minute call/);
+  assert.match(js, /\[data-booking\]/);
+  assert.deepEqual(bookingLinkAttributes("#intake"), { href: "#intake" });
+  assert.deepEqual(bookingLinkAttributes("https://cal.com/munilink/20min"), { href: "https://cal.com/munilink/20min", target: "_blank", rel: "noopener noreferrer" });
+});
+
+test("checklist capture form is optional, POPIA-consented and never gates the 15 items", async () => {
+  assert.match(checklist, /Email me the printable version and updates when AGSA guidance changes/);
+  const formHtml = checklist.match(/<form class="capture-form"[\s\S]*?<\/form>/)[0];
+  for (const name of ["name", "email", "municipality", "consent", "_honey"]) assert.match(formHtml, new RegExp(`name="${name}"`));
+  assert.match(formHtml, /type="checkbox" name="consent"[^>]*required/);
+  assert.equal((checklist.match(/class="check-item"/g) || []).length, 15);
+  assert.doesNotMatch(checklist, /check-item[^"]*"[^>]*hidden/);
+  assert.ok(validateChecklistRequest({ name: "", email: "x", municipality: "", consent: "" }).consent);
+  assert.deepEqual(validateChecklistRequest({ name: "A", email: "a@b.gov.za", municipality: "M", consent: "yes" }), {});
+  const payload = buildChecklistPayload({ name: "A", email: "a@b.gov.za", municipality: "Kouga", consent: "yes" });
+  assert.equal(payload._subject, "Checklist request \u2013 Kouga");
+  assert.equal(payload._template, "table");
+  let url;
+  const ok = await submitChecklistRequest({ name: "A", email: "a@b.gov.za", municipality: "Kouga", consent: "yes" }, { fetchImpl: async (u) => { url = u; return { ok: true, json: async () => ({ success: "true" }) }; } });
+  assert.equal(ok.method, "endpoint");
+  assert.equal(url, FORM_ENDPOINT);
+  const failed = await submitChecklistRequest({ name: "A", email: "a@b.gov.za", municipality: "Kouga", consent: "yes" }, { fetchImpl: async () => { throw new Error("offline"); } });
+  assert.equal(failed.method, "mailto");
 });
 
 test("checklist page holds 15 items and is hedged as guidance", () => {
