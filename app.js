@@ -1,3 +1,8 @@
+import {
+  BOOKING_URL, bookingLinkAttributes, readIntake, submitIntake, validateIntake,
+  submitChecklistRequest, validateChecklistRequest,
+} from "./form.js";
+
 const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 const transition = (callback) => {
@@ -31,18 +36,89 @@ navigation?.addEventListener("click", (event) => {
   }
 });
 
-const dialog = document.querySelector("[data-dialog]");
-document.querySelectorAll("[data-open-dialog]").forEach((button) => {
-  button.addEventListener("click", () => transition(() => dialog?.showModal()));
-});
-document.querySelectorAll("[data-close-dialog]").forEach((button) => {
-  button.addEventListener("click", () => transition(() => dialog?.close()));
-});
-dialog?.addEventListener("click", (event) => {
-  if (event.target === dialog) transition(() => dialog.close());
+// ---- Booking links: point every [data-booking] button at BOOKING_URL once it is a real URL ----
+if (/^https?:\/\//i.test(BOOKING_URL)) {
+  document.querySelectorAll("[data-booking]").forEach((link) => {
+    for (const [key, value] of Object.entries(bookingLinkAttributes(BOOKING_URL))) link.setAttribute(key, value);
+  });
+}
+
+// ---- Discovery-call intake form (FormSubmit AJAX, mailto fallback) ----
+const form = document.querySelector("[data-intake-form]");
+const thanks = document.querySelector("[data-intake-thanks]");
+
+const showErrors = (target, errors, prefix = "e-") => {
+  target.querySelectorAll("[aria-invalid]").forEach((el) => el.removeAttribute("aria-invalid"));
+  target.querySelectorAll(".field-error").forEach((el) => { el.textContent = ""; });
+  let first = null;
+  for (const [name, message] of Object.entries(errors)) {
+    const inputs = target.querySelectorAll(`[name="${name}"]`);
+    inputs.forEach((input) => input.setAttribute("aria-invalid", "true"));
+    const holder = document.getElementById(`${prefix}${name}`);
+    if (holder) holder.textContent = message;
+    first ??= inputs[0];
+  }
+  first?.focus();
+};
+
+form?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const data = readIntake(new FormData(form));
+  const errors = validateIntake(data);
+  showErrors(form, errors);
+  if (Object.keys(errors).length) return;
+
+  const button = form.querySelector('[type="submit"]');
+  button.disabled = true;
+  button.setAttribute("aria-busy", "true");
+  try {
+    const result = await submitIntake(data);
+    thanks.querySelector("[data-mailto-fallback]")?.setAttribute("href", result.url);
+    if (result.method === "mailto") {
+      thanks.querySelector("h3").textContent = "Almost done: send the email that just opened.";
+      thanks.querySelector("[data-thanks-message]").textContent = "Your email app should have opened with your details filled in. Send it, and we will reply to agree a time for the call.";
+      thanks.querySelector("[data-thanks-fallback]")?.removeAttribute("hidden");
+      window.location.href = result.url;
+    }
+    transition(() => { form.hidden = true; thanks.hidden = false; thanks.focus(); });
+  } finally {
+    button.disabled = false;
+    button.removeAttribute("aria-busy");
+  }
 });
 
-document.querySelector("[data-year]").textContent = new Date().getFullYear();
+// ---- Optional checklist capture (the checklist itself stays open) ----
+const captureForm = document.querySelector("[data-checklist-form]");
+captureForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const data = readIntake(new FormData(captureForm));
+  const errors = validateChecklistRequest(data);
+  showErrors(captureForm, errors, "ce-");
+  if (Object.keys(errors).length) return;
+  const status = captureForm.querySelector("[data-capture-status]");
+  const button = captureForm.querySelector('[type="submit"]');
+  button.disabled = true;
+  try {
+    const result = await submitChecklistRequest(data);
+    if (result.method === "endpoint") {
+      status.textContent = "Thank you. We will email the printable checklist to you shortly.";
+      captureForm.querySelectorAll("input:not([type=checkbox])").forEach((input) => { input.value = ""; });
+      captureForm.querySelector("[name=consent]").checked = false;
+    } else {
+      status.innerHTML = "";
+      status.append("Your email app should have opened with the request filled in. ");
+      const link = Object.assign(document.createElement("a"), { href: result.url, textContent: "Open it again" });
+      status.append(link, ".");
+      window.location.href = result.url;
+    }
+  } finally {
+    button.disabled = false;
+  }
+});
+
+document.querySelectorAll("[data-print]").forEach((button) => button.addEventListener("click", () => window.print()));
+
+document.querySelectorAll("[data-year]").forEach((node) => { node.textContent = new Date().getFullYear(); });
 
 class TopographicShader {
   constructor(canvas) {
